@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -9,12 +10,15 @@ public class SpawnManager : MonoBehaviour
     Vector3 spawnRandomPosition;
     public float minMassRange = 0.5f;
     public float maxMassRange = 2.5f;
+    public bool isGameOver;
 
     int waves = 1;
     public GameObject powerUpPrefab;
 
-    GameObject player;
+    public GameObject player;
+    GameObject canvas;
     Vector3 inicialPosition;
+    public Text gameOverText;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,7 +26,13 @@ public class SpawnManager : MonoBehaviour
         Instantiate(powerUpPrefab, GenerateRandomPosition(), powerUpPrefab.transform.rotation);
 
         player = GameObject.Find("Player");
+        //string lifes = "3"; // function to change from string to Integer
+        //lifesInt = lifesInt - 2;
         inicialPosition = player.transform.position;
+        canvas = GameObject.Find("Canvas");
+        gameOverText = canvas.transform.GetChild(0).GetComponent<Text>();
+        gameOverText.enabled = false; // set unactive the text
+
     }
     
 
@@ -30,20 +40,49 @@ public class SpawnManager : MonoBehaviour
     void Update()
     {
         int enemiesCount = FindObjectsOfType<Enemy>().Length;
-        if (enemiesCount == 0)
+        if (enemiesCount == 0 && !isGameOver)
         {
             waves++;
             SpawnEnemyWave(waves);
             Instantiate(powerUpPrefab, GenerateRandomPosition(), powerUpPrefab.transform.rotation);
         
         }
-        if (player.transform.position.y == -10)
+        if (player.transform.position.y <= -10)
         {
-            player.transform.position == inicialPosition
+            isGameOver = true;
+            gameOverText.enabled = true;
+            if (Input.anyKeyDown)// the player has dissapeared
+            {
+                RestartGame();
+
+            }
         }
         if (Input.anyKeyDown && player == null)
         {
             Instantiate(player, player.transform.position, player.transform.rotation);
+        }
+    }
+
+    void RestartGame()
+    {
+
+        player.transform.position = inicialPosition;
+        waves = 1;
+        SpawnEnemyWave(waves);
+        isGameOver = false;
+        gameOverText.enabled = false;
+        int powerupCount = GameObject.FindGameObjectsWithTag("Powerup").Length;
+        if(powerupCount == 0)
+        {
+            Instantiate(powerUpPrefab, GenerateRandomPosition(), powerUpPrefab.transform.rotation);
+        }
+        else if (powerupCount > 1)
+        {
+            for (int i = 0; i < powerupCount; i++)
+            {
+                GameObject PowerupToDestroy = GameObject.FindGameObjectWithTag("Powerup");
+                Destroy(PowerupToDestroy);
+            }
         }
     }
 
@@ -61,7 +100,7 @@ public class SpawnManager : MonoBehaviour
         for (int i = 0; i < enemiesToSpawn; i++)
         {
 
-            GameObject enemy =Instantiate(enemyPrefab, GenerateRandomPosition(), enemyPrefab.transform.rotation);
+            GameObject enemy = Instantiate(enemyPrefab, GenerateRandomPosition(), enemyPrefab.transform.rotation);
             Rigidbody enemyRB = enemy.GetComponent<Rigidbody>();
             Enemy enemyScript = enemy.GetComponent<Enemy>();
 
