@@ -8,8 +8,8 @@ public class SpawnManager : MonoBehaviour
     public GameObject enemyPrefab;
     float spawnRange = 10;
     Vector3 spawnRandomPosition;
-    public float minMassRange = 0.5f;
-    public float maxMassRange = 2.5f;
+    public float minMassRange = 0.1f;
+    public float maxMassRange = 0.4f;
     public bool isGameOver;
 
     int waves = 1;
@@ -19,6 +19,7 @@ public class SpawnManager : MonoBehaviour
     GameObject canvas;
     Vector3 inicialPosition;
     public Text gameOverText;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -71,7 +72,7 @@ public class SpawnManager : MonoBehaviour
         SpawnEnemyWave(waves);
         isGameOver = false;
         gameOverText.enabled = false;
-        int powerupCount = GameObject.FindGameObjectsWithTag("Powerup").Length;
+        int powerupCount = GameObject.FindGameObjectsWithTag("PowerUp").Length;
         if(powerupCount == 0)
         {
             Instantiate(powerUpPrefab, GenerateRandomPosition(), powerUpPrefab.transform.rotation);
@@ -80,7 +81,7 @@ public class SpawnManager : MonoBehaviour
         {
             for (int i = 0; i < powerupCount; i++)
             {
-                GameObject PowerupToDestroy = GameObject.FindGameObjectWithTag("Powerup");
+                GameObject PowerupToDestroy = GameObject.FindGameObjectWithTag("PowerUp");
                 Destroy(PowerupToDestroy);
             }
         }
@@ -97,7 +98,7 @@ public class SpawnManager : MonoBehaviour
 
     void SpawnEnemyWave (int enemiesToSpawn)
     {
-        for (int i = 0; i < enemiesToSpawn; i++)
+        for (int i = 0; i <= enemiesToSpawn; i++)
         {
 
             GameObject enemy = Instantiate(enemyPrefab, GenerateRandomPosition(), enemyPrefab.transform.rotation);
@@ -106,9 +107,9 @@ public class SpawnManager : MonoBehaviour
 
 
             enemyRB.mass = Random.Range(minMassRange, maxMassRange);
-            float currentMass = enemyRB.mass;
-            enemy.transform.localScale = new Vector3(currentMass, currentMass, currentMass);
-            enemyScript.speed = enemyScript.speed + currentMass;
+            //float currentMass = enemyRB.mass;
+            //enemy.transform.localScale = new Vector3(currentMass, currentMass, currentMass);
+            //enemyScript.speed = enemyScript.speed + currentMass;
 
            
             
